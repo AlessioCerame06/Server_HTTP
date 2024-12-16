@@ -31,7 +31,7 @@ public class Main {
             }while(!header.isEmpty());
             System.out.println("fine");
 
-            String response = "";
+            /*String response = "";
             if(resource.equals("/index.html")){
                 response = "<html><body><b>BENVENUTO alla pagina principale</b></body></html>";
                 out.writeBytes("HTTP/1.1 200 OK\n");
@@ -46,13 +46,12 @@ public class Main {
                 out.writeBytes("Content-Length: "+ response.length() +"\n");
                 out.writeBytes("\n");
                 out.writeBytes(response);
-            }
-
+            } */
             File file = new File("htdocs/index.html");
             if(file.exists()){
                 out.writeBytes("HTTP/1.1 200 OK\n");
                 out.writeBytes("Content-Length: " + file.length() + "\n");
-                out.writeBytes("Content-Type: image/png\n");
+                out.writeBytes("Content-Type: " + getContentType(file) + "\n");
                 out.writeBytes("\n");
 
                 // legge un file, buttando fuori il contenuto di un file a blocchi di 8k
@@ -63,7 +62,36 @@ public class Main {
                     out.write(buf, 0, n);
                 }
                 input.close();
+            } else {
+                String risposta = "Pagina non trovata";
+                out.writeBytes("HTTP/1.1 404 Not Found\n");
+                out.writeBytes("Content-Length: " + risposta.length() + "\n");
+                out.writeBytes("Content-Type: text/html\n");
+                out.writeBytes(risposta + "\n");
+                out.writeBytes("\n");
             }
+            s.close();
+        }
+    }
+
+    private static String getContentType(File f) {
+        String[] s = f.getName().split("\\.");
+        String ext = s[s.length - 1];
+        switch (ext) {
+            case "html":
+            case "htm":
+                return "text/html";
+            case "png":
+                return "image/png";
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "css":
+                return "text/css";
+            case "javascript":
+                return "application/javascript";
+            default:
+                return "";
         }
     }
 }
